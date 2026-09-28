@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Digital HD</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+    color: white;
+    background: #050816;
+    position: relative;
+}
+
+/* Fundo animado com gradiente */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        #050816 0%,
+        #0a1230 25%,
+        #050816 50%,
+        #0d0a2e 75%,
+        #050816 100%
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    z-index: -3;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Partículas flutuantes */
+.particulas {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.particula {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0, 217, 255, .12);
+    animation: flutuar linear infinite;
+}
+
+@keyframes flutuar {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Orbes de luz */
+body::after {
+    content: "";
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 217, 255, .25), transparent 70%);
+    top: -200px;
+    left: -200px;
+    filter: blur(80px);
+    animation: orbita 12s infinite alternate ease-in-out;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes orbita {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: .5;
+    }
+    100% {
+        transform: translate(150px, 100px) scale(1.4);
+        opacity: .8;
+    }
+}
+
+.orb2 {
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(116, 60, 255, .25), transparent 70%);
+    bottom: -180px;
+    right: -180px;
+    filter: blur(80px);
+    animation: orbita2 14s infinite alternate ease-in-out;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes orbita2 {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: .4;
+    }
+    100% {
+        transform: translate(-120px, -90px) scale(1.3);
+        opacity: .7;
+    }
+}
+
+.calculadora {
+    width: min(430px, 94vw);
+    padding: 24px;
+    border-radius: 28px;
+    background: rgba(10, 18, 35, .82);
+    border: 1px solid rgba(255, 255, 255, .12);
+    box-shadow: 
+        0 25px 70px rgba(0, 0, 0, .6),
+        inset 0 1px 0 rgba(255, 255, 255, .08);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+    position: relative;
+    z-index: 1;
+    animation: aparecer .8s cubic-bezier(.16, 1, .3, 1);
+}
+
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Brilho superior da calculadora */
+.calculadora::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, .6), transparent);
+    border-radius: 50%;
+}
+
+/* Relógio */
+.relogio {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.hora {
+    font-size: clamp(35px, 10vw, 52px);
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #fff;
+    text-shadow: 
+        0 0 20px rgba(0, 217, 255, .6),
+        0 0 40px rgba(0, 217, 255, .3);
+    font-variant-numeric: tabular-nums;
+}
+
+.data {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #9baac2;
+    letter-spacing: .5px;
+    text-transform: capitalize;
+}
+
+/* Display */
+.display {
+    min-height: 120px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, .4);
+    border: 1px solid rgba(255, 255, 255, .07);
+    text-align: right;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, .3);
+}
+
+.display::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, .3), transparent);
+}
+
+.operacao {
+    min-height: 24px;
+    color: #8c9ab0;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    transition: color .2s;
+    word-break: break-all;
+}
+
+.resultado {
+    margin-top: 8px;
+    font-size: clamp(32px, 9vw, 48px);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+    transition: all .2s;
+    text-shadow: 0 0 30px rgba(0, 217, 255, .2);
+}
+
+/* Teclado */
+.teclado {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+button {
+    min-height: 62px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 17px;
+    background: rgba(255, 255, 255, .06);
+    color: white;
+    font-size: 21px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s cubic-bezier(.4, 0, .2, 1);
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, .15), transparent 70%);
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, .12);
+    border-color: rgba(255, 255, 255, .2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .3);
+}
+
+button:hover::before {
+    opacity: 1;
+}
+
+button:active {
+    transform: scale(.94);
+    box-shadow: none;
+}
+
+.operador {
+    color: #48dfff;
+    background: rgba(0, 217, 255, .08);
+    border-color: rgba(0, 217, 255, .15);
+}
+
+.operador:hover {
+    background: rgba(0, 217, 255, .18);
+    border-color: rgba(0, 217, 255, .3);
+    box-shadow: 0 4px 20px rgba(0, 217, 255, .15);
+}
+
+.limpar {
+    color: #ff7180;
+    background: rgba(255, 113, 128, .06);
+    border-color: rgba(255, 113, 128, .12);
+}
+
+.limpar:hover {
+    background: rgba(255, 113, 128, .15);
+    border-color: rgba(255, 113, 128, .3);
+    box-shadow: 0 4px 20px rgba(255, 113, 128, .12);
+}
+
+.igual {
+    grid-column: span 2;
+    color: #031018;
+    background: linear-gradient(135deg, #00eaff, #765cff);
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 234, 255, .3);
+}
+
+.igual:hover {
+    background: linear-gradient(135deg, #33efff, #8b75ff);
+    box-shadow: 0 6px 30px rgba(0, 234, 255, .45);
+    transform: translateY(-2px);
+}
+
+.igual:active {
+    transform: scale(.94);
+    box-shadow: 0 2px 10px rgba(0, 234, 255, .3);
+}
+
+.zero {
+    grid-column: span 2;
+}
+
+.info {
+    margin-top: 14px;
+    text-align: center;
+    color: #5a6a82;
+    font-size: 11px;
+    letter-spacing: .3px;
+}
+
+/* Responsividade */
+@media (max-width: 400px) {
+    .calculadora {
+        padding: 16px;
+        border-radius: 22px;
+    }
+    
+    button {
+        min-height: 56px;
+        font-size: 19px;
+        border-radius: 14px;
+    }
+    
+    .display {
+        min-height: 100px;
+        padding: 16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Partículas flutuantes -->
+<div class="particulas" id="particulas"></div>
+<div class="orb2"></div>
+
+<div class="calculadora">
+
+    <div class="relogio">
+        <div class="hora" id="hora">00:00:00</div>
+        <div class="data" id="data">Carregando...</div>
+    </div>
+
+    <div class="display">
+        <div class="operacao" id="operacao"></div>
+        <div class="resultado" id="resultado">0</div>
+    </div>
+
+    <div class="teclado">
+
+        <button class="limpar" onclick="limpar()">AC</button>
+        <button onclick="apagar()">⌫</button>
+        <button class="operador" onclick="adicionar('%')">%</button>
+        <button class="operador" onclick="adicionar('/')">÷</button>
+
+        <button onclick="adicionar('7')">7</button>
+        <button onclick="adicionar('8')">8</button>
+        <button onclick="adicionar('9')">9</button>
+        <button class="operador" onclick="adicionar('*')">×</button>
+
+        <button onclick="adicionar('4')">4</button>
+        <button onclick="adicionar('5')">5</button>
+        <button onclick="adicionar('6')">6</button>
+        <button class="operador" onclick="adicionar('-')">−</button>
+
+        <button onclick="adicionar('1')">1</button>
+        <button onclick="adicionar('2')">2</button>
+        <button onclick="adicionar('3')">3</button>
+        <button class="operador" onclick="adicionar('+')">+</button>
+
+        <button class="zero" onclick="adicionar('0')">0</button>
+        <button onclick="adicionar('.')">.</button>
+        <button class="igual" onclick="calcular()">=</button>
+
+    </div>
+
+    <div class="info">
+        Calculadora Digital HD • Teclado também funciona
+    </div>
+
+</div>
+
+<script>
+let expressao = "";
+let resultadoNovo = false;
+
+const resultado = document.getElementById("resultado");
+const operacao = document.getElementById("operacao");
+
+/* Gera partículas flutuantes */
+function gerarParticulas() {
+    const container = document.getElementById("particulas");
+    const quantidade = 25;
+
+    for (let i = 0; i < quantidade; i++) {
+        const p = document.createElement("div");
+        p.className = "particula";
+
+        const tamanho = Math.random() * 4 + 1;
+        const left = Math.random() * 100;
+        const duracao = Math.random() * 20 + 15;
+        const delay = Math.random() * 20;
+
+        p.style.width = tamanho + "px";
+        p.style.height = tamanho + "px";
+        p.style.left = left + "%";
+        p.style.animationDuration = duracao + "s";
+        p.style.animationDelay = delay + "s";
+
+        // Variação de cor
+        const cores = [
+            "rgba(0, 217, 255, .15)",
+            "rgba(116, 60, 255, .15)",
+            "rgba(0, 234, 255, .12)",
+            "rgba(139, 117, 255, .12)"
+        ];
+        p.style.background = cores[Math.floor(Math.random() * cores.length)];
+
+        container.appendChild(p);
+    }
+}
+
+gerarParticulas();
+
+function adicionar(valor) {
+
+    if (resultadoNovo && /[0-9.]/.test(valor)) {
+        expressao = "";
+        operacao.textContent = "";
+        resultadoNovo = false;
+    }
+
+    if (
+        valor === "." &&
+        expressao.split(/[+\-*/%]/).pop().includes(".")
+    ) {
+        return;
+    }
+
+    expressao += valor;
+
+    resultado.textContent = expressao || "0";
+}
+
+function limpar() {
+    expressao = "";
+    resultado.textContent = "0";
+    operacao.textContent = "";
+    resultadoNovo = false;
+}
+
+function apagar() {
+    expressao = expressao.slice(0, -1);
+    resultado.textContent = expressao || "0";
+}
+
+function calcular() {
+
+    if (!expressao) return;
+
+    try {
+
+        let conta = expressao;
+
+        // Converte porcentagem
+        conta = conta.replace(
+            /(\d+(?:\.\d+)?)%/g,
+            "($1/100)"
+        );
+
+        // Permite somente caracteres matemáticos
+        if (!/^[0-9+\-*/().% ]+$/.test(conta)) {
+            throw new Error();
+        }
+
+        let valor = Function(
+            '"use strict"; return (' + conta + ')'
+        )();
+
+        if (!Number.isFinite(valor)) {
+            throw new Error();
+        }
+
+        valor = Math.round(valor * 1000000000000) / 1000000000000;
+
+        operacao.textContent = expressao + " =";
+        resultado.textContent = valor;
+
+        expressao = String(valor);
+        resultadoNovo = true;
+
+    } catch {
+        resultado.textContent = "Erro";
+        operacao.textContent = "Expressão inválida";
+        expressao = "";
+        resultadoNovo = true;
+    }
+}
+
+/* Teclado físico */
+document.addEventListener("keydown", function(event) {
+
+    const tecla = event.key;
+
+    if (/^[0-9.]$/.test(tecla)) {
+        adicionar(tecla);
+    }
+
+    else if (["+", "-", "*", "/", "%"].includes(tecla)) {
+        adicionar(tecla);
+    }
+
+    else if (tecla === "Enter" || tecla === "=") {
+        event.preventDefault();
+        calcular();
+    }
+
+    else if (tecla === "Backspace") {
+        apagar();
+    }
+
+    else if (tecla === "Escape") {
+        limpar();
+    }
+});
+
+/* Relógio */
+function atualizarRelogio() {
+
+    const agora = new Date();
+
+    const hora = agora.toLocaleTimeString("pt-BR");
+
+    const data = agora.toLocaleDateString(
+        "pt-BR",
+        {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }
+    );
+
+    document.getElementById("hora").textContent = hora;
+    document.getElementById("data").textContent = data;
+}
+
+atualizarRelogio();
+setInterval(atualizarRelogio, 1000);
+</script>
+
+</body>
+</html>
